@@ -34,7 +34,7 @@ Tasks #1, #2, #3, #4 shipped in Sprint 2. New item #13 added.
 | 6 | **Focus smoothing.** Per-frame lerp toward target opacity/size/saturation so the focus zone glides instead of snapping. Single damping factor exposed for tuning (~0.15 initial guess). | 1 | Without this, 36 bubbles snapping on cursor movement looks like noise rather than depth-of-field. |
 | 7 | **Click -> detail panel placeholder.** Reuse the same 2D projection used for focus, plus radius hit-test. Click opens a side panel (Qt widget or overlay) with ticker, verdict, reason from analyze_stock dict. Nothing fancy. | 2 | Original spec promised a detail view on click. Placeholder unblocks the end-to-end interaction loop. |
 | 8 | **3DConnexion SpaceMouse integration.** Per owns one. pyqtgraph has no native binding; needs the 3dconnexion python SDK or raw HID. Camera fly-through (translate XY + orbit yaw) is the natural mapping. | 3 | Hardware is sitting there. Worth a focused side quest once the scene justifies free-look navigation. |
-| 13 | **Back-face culling on sphere meshes.** Sphere geometry shows triangulated back-face wireframe pattern through the translucent front from certain angles (visible at start of Sprint 3 -- seen during free-orbit testing in Sprint 2). Fix: add GL_CULL_FACE to GLMeshItem glOptions; bump mesh density from rows=10 cols=18 to rows=20 cols=30 for smoother silhouettes. Probably ride in with Sprint 3 cursor-focus work. | 1 | Cosmetic but visible. Cheap fix. |
+| 13 | **Back-face culling on sphere meshes.** Sphere geometry shows triangulated back-face wireframe pattern through the translucent front from certain angles (seen during Sprint 2 free-orbit testing). Fix: add GL_CULL_FACE to GLMeshItem glOptions; bump mesh density from rows=10 cols=18 to rows=20 cols=30 for smoother silhouettes. Probably ride in with Sprint 3 cursor-focus work. | 1 | Cosmetic but visible. Cheap fix. |
 
 ### Tier 2 -- Wait for the above to prove the concept (~15 SP)
 
@@ -49,9 +49,12 @@ Tasks #1, #2, #3, #4 shipped in Sprint 2. New item #13 added.
 
 - **Catalyst sparkles + glow shaders.** Real-time particle effects on `catalyst=True` bubbles. Custom GLSL.
 - **Animated tier transitions.** When verdict changes between renders, bubble swims forward/back along Z instead of teleporting. Discipline reinforced: you literally see capital migrating.
-- **Trail history.** Each bubble leaves a fading trail showing last N verdicts. Needs stable verdict_log query API.
+- **Verdict-history trails.** Each bubble leaves a fading trail showing last N verdicts (historical signal, not motion trails). Needs stable verdict_log query API.
 - **Real depth-of-field via render-to-texture.** Replaces fake-blur with actual gaussian blur compositing.
 - **Sonification.** SID chord per verdict tier triggered on verdict-change events. Per's wheelhouse.
+- **ESP32 satellite displays.** Pinned-ticker side screens on T-Display Lilygo S3 boards over WiFi. Main scene "throws" a bubble; it leaves the 3D view with an animation; pops up on a physical screen showing that ticker's verdict + tech rows + ML score, cycling Fundamentals / Technicals / ML on a button. Long-press releases the ticker back to the main scene. JSON over MQTT or tiny HTTP. ESP-side render with LovyanGFX; matching Lissajous bubble on the small screen for visual continuity. Pure theatre but the good kind.
+- **Web / Pi port.** If the main cockpit eventually moves to a browser, the 3D layer probably gets rewritten in three.js or regl. Or stays Qt and ships on a Pi 5 with a touchscreen. Touch interaction redesigns "cursor-as-focal-point" into "tap-to-pull-forward" / flick-to-throw. Decided in Sprint 2 not to over-invest in PyQt-specific polish that wouldn't port; the fake-blur-via-opacity choice ages well on weaker hardware regardless.
+- **Idle screensaver mode.** Input-timeout cascade: active (you're driving the camera) -> ambient sway only; idle short (~5s after last input) -> slow auto-orbit kicks in; idle long (~30s+) -> planetary mode where tier positions become orbital paths (NOW BUY tight/fast, NOW SELL barely drifts), bubble trails, bloom, random warp-zooms through the scene, occasional catalyst sparks. SID arpeggio underneath if audio is wired. First user input snaps back to active mode instantly, no fade. Sub-features (trails / bloom / warp / sparks / audio) only make sense together as a system; building any one in isolation is wasted effort. Net effect: tool when you're using it, demoscene piece when you're not.
 
 
 ## Sprint Log
